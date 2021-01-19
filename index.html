@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/angular_material/1.2.1/angular-material.min.css" />
+
+  <link rel="stylesheet" href="style.css" />
+
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular-animate.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular-aria.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular-messages.min.js"></script>
+
+  <!-- AngularJS Material Javascript now available via Google CDN; version 1.2.1 used here -->
+  <script src="https://ajax.googleapis.com/ajax/libs/angular_material/1.2.1/angular-material.min.js"></script>
+
+  <script data-require="ui-bootstrap@*" data-semver="0.12.1"
+    src="http://angular-ui.github.io/bootstrap/ui-bootstrap-tpls-0.12.1.min.js"></script>
+  <script src="https://angular-ui.github.io/bootstrap/ui-bootstrap-tpls-2.5.0.js"></script>
+  <link href="https://netdna.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+
+  <link rel="stylesheet" href="https://use.typekit.net/vwf6pwe.css" />
+
+  <script src="app.js"></script>
+</head>
+
+<body>
+  <div ng-app="webapp" ng-controller="AppCtrl" layout="column" ng-cloak>
+    <div flex="100" layout="row" class="justify-content-center">
+      <h3 class="md-display-3 logo">Font Picker</h3>
+    </div>
+    <div layout="row" class="justify-content-center" layout-margin="">
+      <div flex="95">
+        <md-content layout-fill>
+          <div ng-style="fontStyle" ng-bind-html="para"></div>
+
+          <uib-accordion layout-margin>
+            <div uib-accordion-group class="panel-default" is-open="expandFontPicker">
+              <uib-accordion-heading>
+                Format Text <i class="pull-right glyphicon"
+                  ng-class="{'glyphicon-chevron-down': expandFontPicker, 'glyphicon-chevron-right': !expandFontPicker}"></i>
+              </uib-accordion-heading>
+              <form layout="column" layout-wrap class="md-inline-form">
+                <div layout="row" class="justify-content-center" layout-padding>
+
+                  <md-input-container flex="10" class="md-block">
+                    <h2 class="logo m-0" ng-click="redirectTo()">Fonts</h2>
+                  </md-input-container>
+
+
+                  <md-input-container flex="20" class="md-block">
+                    <label>Search Fonts</label>
+                    <input type="text" name="search" ng-model="search.$" aria-label="serach text"
+                      ng-keyup="filterByClass(selectedClass, search.$)">
+                  </md-input-container>
+
+                  <md-input-container flex="20">
+                    <label>Sort</label>
+                    <md-select ng-model="order" aria-label="sort fonts">
+                      <md-option ng-repeat="item in orderList" value="{{item}}" ng-click="sortBy(item)">
+                        {{item}}
+                      </md-option>
+                    </md-select>
+                  </md-input-container>
+
+                  <md-input-container flex="20">
+                    <label>Sample Text</label>
+                    <input type="text" name="usersText" ng-model="usersText.$" aria-label="custom text"
+                      ng-keyup="customText = usersText.$ || 'AaBb'">
+                  </md-input-container>
+
+                  <md-input-container flex="20" class="md-block">
+                    <div>
+                      <label class="w-100 text-muted">
+                        <span>Text Size</span>
+                        <span class="pull-right">{{fontSize}}</span>
+                      </label>
+                      <md-slider-container>
+                        <span>a</span>
+                        <md-slider min="14" max="100" ng-model="fontSize" aria-span="size" id="size-slider"
+                          class="md-warn" aria-label="font size">
+                        </md-slider>
+                        <md-input-container>
+                          <span>A</span>
+                        </md-input-container>
+                      </md-slider-container>
+                    </div>
+                  </md-input-container>
+                </div>
+              </form>
+
+              <md-divider></md-divider>
+
+              <div layout="row" class="justify-content-center" layout-margin="">
+                <div flex="30">
+                  <uib-accordion>
+                    <div uib-accordion-group class="panel-default" is-open="expandCls">
+                      <uib-accordion-heading>
+                        <span class="text-muted">CLASSIFICATION<i class="pull-right glyphicon"
+                            ng-class="{'glyphicon-chevron-down': expandCls, 'glyphicon-chevron-right': !expandCls}"></i></span>
+                      </uib-accordion-heading>
+                      <section layout="row" layout-sm="column" layout-wrap>
+                        <md-button ng-repeat="item in classtnList" class="md-raised"
+                          ng-class="{'md-primary': selectedClass === item}" ng-click="filterByClass(item, search.$)">
+                          {{item}}</md-button>
+                      </section>
+                    </div>
+                  </uib-accordion>
+                </div>
+                <div flex="70">
+                  <div ng-if="loading" layout="row" layout-sm="column" layout-align="space-around">
+                    <md-progress-circular md-mode="indeterminate"></md-progress-circular>
+                  </div>
+                  <md-grid-list md-cols="4" md-row-height="1:1" md-gutter="12px">
+                    <md-grid-tile ng-repeat="item in fontsPerPage | filter:search" ng-click="change(item.css_stack)">
+                      <span class="overflow-hidden grid-font"
+                        ng-attr-style="font-family: {{item.css_stack}}; font-size: {{fontSize}}px">{{customText}}</span>
+
+                      <md-grid-tile-footer>
+                        <h3 class="text-black f-600">{{item.name}}</h3>
+                      </md-grid-tile-footer>
+
+                    </md-grid-tile>
+                  </md-grid-list>
+                  <div ng-if="fonts && !fonts.kit.families.length || filteredFonts && !filteredFonts.length">
+                    No search results. Please try other filters!
+                  </div>
+                  <div class="text-center">
+                    <ul ng-if="fonts && fonts.kit.families.length && !search.$ && !selectedClass" uib-pagination
+                      total-items="fonts.kit.families.length" ng-model="bigCurrentPage" max-size="5"
+                      ng-change="pageChanged(bigCurrentPage, search.$)"></ul>
+
+                    <ul ng-if="filteredFonts && filteredFonts.length && (search.$ || selectedClass)" uib-pagination
+                      total-items="filteredFonts.length" ng-model="bigCurrentPage" max-size="5"
+                      ng-change="pageChanged(bigCurrentPage, search.$)"></ul>
+
+                  </div>
+                  <div class="text-center">
+                    <a href="" ng-click="redirectTo()">Find more
+                      fonts like these at Typekit | Learn more</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </uib-accordion>
+        </md-content>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>

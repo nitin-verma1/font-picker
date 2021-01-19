@@ -1,0 +1,17 @@
+{
+  "name": "fontPicker-AngularJs",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "angular": "^1.8.2",
+    "angular-base64": "^2.0.5",
+    "angular-material": "^1.2.2"
+  }
+}
